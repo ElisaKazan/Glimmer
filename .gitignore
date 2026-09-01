@@ -1,0 +1,25 @@
+# Xcode
+
+.DS_Store
+
+build/
+
+DerivedData/
+
+*.xcuserstate
+
+xcuserdata/
+
+*.xcscmblueprint
+
+*.xccheckout
+
+# Swift Package Manager
+
+.build/
+
+# Xcode user-specific files
+
+*.pbxuser
+
+!default.pbxuser
