@@ -45,6 +45,16 @@ struct HomeView: View {
     }
 
     @ViewBuilder private var affirmationSection: some View {
+        VStack(spacing: 50) {
+            affirmationAnimation
+
+            Text("HOLD TO REVEAL")
+                .font(.caption)
+                .foregroundStyle(.glmrGrey)
+        }
+    }
+
+    @ViewBuilder private var affirmationAnimation: some View {
         ZStack {
             // Outer Ring
             Circle()
@@ -63,13 +73,14 @@ struct HomeView: View {
                 .fill(.white.opacity(0.03))
                 .frame(width: 160, height: 160)
 
-            if viewModel.isRevealed {
+            switch viewModel.state {
+            case .revealed:
                 Text(viewModel.testAffirmation.text)
                     .multilineTextAlignment(.center)
                     .padding(30)
                     .transition(.opacity)
-            } else {
-                // Center Point
+            case .hidden:
+                // Centre Point
                 Circle()
                     .stroke(.glmrSecondary.opacity(0.3), lineWidth: 2)
                     .frame(width: 14, height: 14)
@@ -88,13 +99,20 @@ struct HomeView: View {
 
     @ViewBuilder private var footerSection: some View {
         VStack(alignment: .center) {
-            Text("Carry this with you today.")
-                .font(.caption)
-                .foregroundStyle(.glmrGrey)
+            switch viewModel.state {
+            case .revealed:
+                Text("Carry this with you today.")
+                    .font(.footnote)
+                    .foregroundStyle(.glmrGrey)
 
-            Text("A new affirmation waits for you tomorrow.")
-                .font(.caption)
-                .foregroundStyle(.glmrGrey)
+                Text("A new affirmation waits for you tomorrow.")
+                    .font(.footnote)
+                    .foregroundStyle(.glmrGrey)
+            case .hidden:
+                Text("One Affirmation. One Moment. Everyday.")
+                    .font(.footnote)
+                    .foregroundStyle(.glmrGrey)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.horizontal, 16)

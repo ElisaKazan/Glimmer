@@ -9,7 +9,7 @@ import Foundation
 
 @Observable
 final class HomeViewModel {
-    var isRevealed = false
+    var state: DailyState = .hidden
     var userName: String = "Elisa"
     var testAffirmation = Affirmation(
         text: "This is a sample affirmation used for testing.",
@@ -38,7 +38,12 @@ final class HomeViewModel {
     }
 
     func revealAffirmation() {
-        isRevealed = true
+        state = .revealed
     }
 
+}
+
+enum DailyState {
+    case revealed
+    case hidden
 }
