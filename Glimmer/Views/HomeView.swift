@@ -41,7 +41,8 @@ struct HomeView: View {
 
     private func addEntry() {
         withAnimation {
-            let newEntry = Entry(timestamp: Date(),affirmationText: "", category: .abundance)
+            let newAffirmation = Affirmation(text: "This is a test affirmation", category: .abundance)
+            let newEntry = Entry(timestamp: Date(), affirmation: newAffirmation)
             modelContext.insert(newEntry)
         }
     }
