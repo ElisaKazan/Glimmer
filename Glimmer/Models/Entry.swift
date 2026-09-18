@@ -13,7 +13,7 @@ final class Entry {
     var timestamp: Date
     var affirmation: Affirmation
 
-    init(timestamp: Date, affirmation: Affirmation) {
+    public init(timestamp: Date, affirmation: Affirmation) {
         self.timestamp = timestamp
         self.affirmation = affirmation
     }
@@ -24,7 +24,7 @@ final class Affirmation {
     var text: String
     var category: Category
 
-    init(text: String, category: Category) {
+    public init(text: String, category: Category) {
         self.text = text
         self.category = category
     }
