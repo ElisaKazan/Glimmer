@@ -4,6 +4,9 @@ An Affirmation App
 ### Summary
 A daily affirmations app with an interactive element to encourage routine self love and confidence building.
 
+### Product Spec
+[See Notion](https://app.notion.com/p/Glimmer-An-Affirmation-App-3ce9154b7a538073b332c9d2d9b17a2d)
+
 ### Requirements
 #### Core Functionality
 - User can view a new affirmation once a day
