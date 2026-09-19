@@ -1,4 +1,4 @@
-# Glimmer
+# Glimmer ✨
 An Affirmation App
 
 ### Summary
