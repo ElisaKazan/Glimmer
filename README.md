@@ -24,21 +24,6 @@ A daily affirmations app with an interactive element to encourage routine self l
 - User can view all past affirmations, organized by date in a Journal tab ❤️
 - User can filter past affirmations by categories and favourites ❤️
 - User can favourite/unfavourite affirmations ❤️
-#### Nice to Have
-- User can view affirmation from the Home Screen via a Widget
-- User can share an affirmation via a Share Sheet
-- User can view affirmation on Apple Watch
-- User can select light or dark mode
-- User can select a different language
-- User can view their current streak (i.e. how many days they have revealed the affirmation in a row) along with their longest streak
-- User can view a custom greeting based on time of day (i.e. Good morning Elisa, Good evening, etc)
-#### Out of Scope
-- User can complete a quiz to customize the affirmations to their goals
-- User can create custom affirmations
-- User can edit/delete custom affirmations
-- User can record audio affirmations
-- User can add journal entries
-- User can add a daily mood score (i.e. 1 to 5 or emojis)
 
 ### Affirmation Categories
 1. Confidence
@@ -51,30 +36,3 @@ A daily affirmations app with an interactive element to encourage routine self l
 8. Growth
 9. Strength
 10. Abundance
-
-### Vibes
-- Daily Affirmations
-- Inspiration
-- Light
-- Sun
-- Life
-- Yellow
-- Golden
-- Glow
-- Happiness
-- Kindness
-- Self Compassion
-- Love
-- Whole
-- Glimmers
-- Mantra
-- "I Am" Statements
-- Mind
-- Calm
-- Hopeful
-- Therapy
-- Mental Health
-- Mindfullness
-- Inspiration
-- Soft
-- Relaxing
