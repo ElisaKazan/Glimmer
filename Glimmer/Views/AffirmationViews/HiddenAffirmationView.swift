@@ -46,7 +46,6 @@ struct HiddenAffirmationView: View {
 
             // Filled Glow (pulses)
             Circle()
-//                .fill(.glmrSecondary.opacity(0.08))
                 .fill(
                     RadialGradient(
                         stops: [
@@ -66,9 +65,9 @@ struct HiddenAffirmationView: View {
 
             // Centre Point (pulses)
             Circle()
-                .stroke(.glmrSecondary.opacity(0.35), lineWidth: 2)
+                .stroke(.glmrSecondary.opacity(0.45), lineWidth: 2)
                 .frame(width: 14, height: 14)
-                .scaleEffect(isPulsing ? 1.03 : 1.0)
+                .scaleEffect(isPulsing ? 1.04 : 1.0)
                 .opacity(isPulsing ? 1.0 : 0.75)
         }
         .contentShape(Circle())
