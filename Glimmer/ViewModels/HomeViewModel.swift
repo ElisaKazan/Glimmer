@@ -9,18 +9,18 @@ import Foundation
 
 @Observable
 final class HomeViewModel {
-    var state: DailyState = .hidden
+    var revealState: RevealState = .hidden
     var userName: String = "Elisa"
     var testAffirmation = Affirmation(
         text: "This is a sample affirmation used for testing.",
         category: .selfLove
     )
 
-    var isPulsing = true
-
     // TODO: AffirmationService
 
-    init() {}
+    init(revealState: RevealState) {
+        self.revealState = revealState
+    }
 
     // Todays Date (i.e. "TUESDAY, SEPTEMBER 1)
     var formattedTodaysDate: String {
@@ -38,12 +38,11 @@ final class HomeViewModel {
     }
 
     func revealAffirmation() {
-        state = .revealed
+        revealState = .revealed
     }
-
 }
 
-enum DailyState {
+enum RevealState {
     case revealed
     case hidden
 }
