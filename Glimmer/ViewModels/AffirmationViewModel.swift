@@ -1,5 +1,5 @@
 //
-//  HiddenAffirmationViewModel.swift
+//  AffirmationViewModel.swift
 //  Glimmer
 //
 //  Created by Elisa Kazan on 2026-09-23.

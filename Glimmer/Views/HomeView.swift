@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  Glimmer
 //
 //  Created by Elisa Kazan on 2026-09-01.
