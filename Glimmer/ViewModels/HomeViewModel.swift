@@ -22,7 +22,7 @@ final class HomeViewModel {
         self.revealState = revealState
     }
 
-    // Todays Date (i.e. "TUESDAY, SEPTEMBER 1)
+    // Todays Date (i.e. "TUESDAY, SEPTEMBER 1")
     var formattedTodaysDate: String {
         Date.now.formatted(
             .dateTime

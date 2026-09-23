@@ -45,11 +45,12 @@ struct HomeView: View {
     }
 
     @ViewBuilder private var affirmationSection: some View {
+        // TODO: Change this to AffirmationView()
         switch viewModel.revealState {
-        case .revealed:
-            RevealedAffirmationView()
         case .hidden:
             HiddenAffirmationView()
+        case .revealed:
+            RevealedAffirmationView()
         }
     }
 
