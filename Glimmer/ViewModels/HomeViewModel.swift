@@ -37,12 +37,30 @@ final class HomeViewModel {
         "Hello \(userName)!"
     }
 
+    func startHolding() {
+        // The user started holding
+        guard revealState == .hidden else { return }
+        revealState = .holding
+        print("HOLDING STATE")
+    }
+
+    func stopHolding() {
+        // The user stopped holding before reveal
+        guard revealState == .holding else { return }
+        revealState = .hidden
+        print("HIDDEN STATE")
+    }
+
     func revealAffirmation() {
+        // The user held until reveal
+        guard revealState == .holding else { return }
         revealState = .revealed
+        print("REVEALED STATE")
     }
 }
 
 enum RevealState {
     case revealed
     case hidden
+    case holding
 }

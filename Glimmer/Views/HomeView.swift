@@ -19,6 +19,19 @@ struct HomeView: View {
             Spacer()
 
             affirmationSection
+                .onLongPressGesture(
+                    minimumDuration: 3.0,
+                    pressing: { isPressing in
+                        if isPressing {
+                            viewModel.startHolding()
+                        } else if viewModel.revealState == .holding {
+                            viewModel.stopHolding()
+                        }
+                    },
+                    perform: {
+                        viewModel.revealAffirmation()
+                    }
+                )
 
             Spacer()
 
@@ -50,6 +63,8 @@ struct HomeView: View {
             RevealedAffirmationView()
         case .hidden:
             HiddenAffirmationView()
+        case .holding:
+            HoldingAffirmationView()
         }
     }
 
@@ -64,7 +79,7 @@ struct HomeView: View {
                 Text("A new affirmation waits for you tomorrow.")
                     .font(.footnote)
                     .foregroundStyle(.glmrGrey)
-            case .hidden:
+            case .hidden, .holding:
                 Text("One Affirmation. One Moment. Everyday.")
                     .font(.footnote)
                     .foregroundStyle(.glmrGrey)
