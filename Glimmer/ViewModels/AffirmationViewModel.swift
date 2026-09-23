@@ -8,21 +8,28 @@
 import SwiftUI
 
 @Observable
-final class HiddenAffirmationViewModel {
+final class AffirmationViewModel {
     var state: State
     var progress: CGFloat = 0
     var isHolding: Bool = false
 
     private var holdTask: Task<Void, Never>?
+    private let onReveal: () -> Void
 
     let holdDuration: Double = 2.0
 
-    init(state: State) {
+    var testAffirmation = Affirmation(
+        text: "This is a sample affirmation used for testing.",
+        category: .selfLove
+    )
+
+    init(state: State, onReveal: @escaping () -> Void) {
         self.state = state
+        self.onReveal = onReveal
     }
 
     func startHolding() {
-        print("START HOLD")
+        print("💚 START HOLD")
         state = .holding
         isHolding = true
         progress = 0
@@ -43,7 +50,7 @@ final class HiddenAffirmationViewModel {
     }
 
     func stopHolding() {
-        print("STOP HOLD")
+        print("❤️ STOP HOLD")
         guard isHolding else { return }
 
         holdTask?.cancel()
@@ -61,12 +68,13 @@ final class HiddenAffirmationViewModel {
     }
 
     func revealAffirmation() {
-        print("REVEAL")
+        print("⭐️ REVEAL")
         state = .completed
         isHolding = false
         progress = 1
 
         // TODO: Change affirmation state to revealed
+        onReveal()
     }
 
 }

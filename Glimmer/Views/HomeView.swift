@@ -8,6 +8,10 @@
 import SwiftUI
 import SwiftData
 
+/*
+ * Home View
+ * Starting view that contains a welcome header, the interactive affirmation view and an informational footer.
+ */
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @State var viewModel: HomeViewModel = HomeViewModel(revealState: .hidden)
@@ -18,7 +22,12 @@ struct HomeView: View {
 
             Spacer()
 
-            affirmationSection
+            AffirmationView(
+                viewModel: AffirmationViewModel(
+                    state: .hidden,
+                    onReveal: viewModel.revealAffirmation
+                )
+            )
 
             Spacer()
 
@@ -42,16 +51,6 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-    }
-
-    @ViewBuilder private var affirmationSection: some View {
-        // TODO: Change this to AffirmationView()
-        switch viewModel.revealState {
-        case .hidden:
-            HiddenAffirmationView()
-        case .revealed:
-            RevealedAffirmationView()
-        }
     }
 
     @ViewBuilder private var footerSection: some View {
