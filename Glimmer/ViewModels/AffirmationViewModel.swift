@@ -19,6 +19,7 @@ final class AffirmationViewModel {
     let holdDuration: Double = 2.0
 
     var testAffirmation = Affirmation(
+        id: UUID(),
         text: "This is a sample affirmation used for testing.",
         category: .selfLove
     )

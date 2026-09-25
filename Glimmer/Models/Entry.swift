@@ -19,26 +19,27 @@ final class Entry {
     }
 }
 
-@Model
-final class Affirmation {
+struct Affirmation: Codable, Equatable {
+    var id: UUID
     var text: String
     var category: Category
 
-    public init(text: String, category: Category) {
+    public init(id: UUID, text: String, category: Category) {
+        self.id = id
         self.text = text
         self.category = category
     }
 }
 
 enum Category: String, Codable {
-    case selfLove
-    case confidence
-    case success
-    case abundance
-    case wellBeing
-    case relationships
-    case peace
-    case growth
+    case selfLove = "self-love"
+    case confidence = "confidence"
+    case success = "success"
+    case abundance = "abundance"
+    case wellBeing = "well-being"
+    case relationships = "relationships"
+    case peace = "peace"
+    case growth = "growth"
 
     var title: String {
         switch self {

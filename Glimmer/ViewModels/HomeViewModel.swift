@@ -12,6 +12,7 @@ final class HomeViewModel {
     var revealState: RevealState = .hidden
     var userName: String = "Elisa"
     var testAffirmation = Affirmation(
+        id: UUID(),
         text: "This is a sample affirmation used for testing.",
         category: .selfLove
     )
