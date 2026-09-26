@@ -11,12 +11,6 @@ import Foundation
 final class HomeViewModel {
     var revealState: RevealState = .hidden
     var userName: String = "Elisa"
-    var testAffirmation = Affirmation(
-        text: "This is a sample affirmation used for testing.",
-        category: .selfLove
-    )
-
-    // TODO: AffirmationService
 
     init(revealState: RevealState) {
         self.revealState = revealState
@@ -37,12 +31,21 @@ final class HomeViewModel {
         "Hello \(userName)!"
     }
 
-    func revealAffirmation() {
-        revealState = .revealed
+    func revealAffirmation(_ affirmation: Affirmation) {
+        revealState = .revealed(affirmation)
     }
 }
 
 enum RevealState {
-    case revealed
+    case revealed(Affirmation)
     case hidden
+
+    var affirmationState: AffirmationState {
+        switch self {
+        case .revealed(let affirmation):
+            .completed(affirmation)
+        case .hidden:
+            .hidden
+        }
+    }
 }

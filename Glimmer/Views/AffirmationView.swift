@@ -23,8 +23,8 @@ struct AffirmationView: View {
             switch viewModel.state {
             case .hidden, .holding:
                 hiddenAffirmationView
-            case .completed:
-                revealedAffirmationView
+            case .completed(let affirmation):
+                revealedAffirmationView(affirmation)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -142,7 +142,7 @@ struct AffirmationView: View {
             .opacity(isPulsing ? 1.0 : 0.75)
 
         // Centre Point Outline
-        if viewModel.state == .holding {
+        if case .holding = viewModel.state {
             Circle()
                 .stroke(colour, lineWidth: 2)
                 .frame(width: 20, height: 20)
@@ -151,12 +151,13 @@ struct AffirmationView: View {
 
     // MARK: - Revealed State
 
-    @ViewBuilder private var revealedAffirmationView: some View {
+    @ViewBuilder
+    private func revealedAffirmationView(_ affirmation: Affirmation) -> some View {
         VStack(alignment: .center, spacing: 16) {
             glowSection
 
             // Affirmation
-            Text("\"\(viewModel.testAffirmation.text)\"")
+            Text("\(affirmation.prettyText)")
                 .multilineTextAlignment(.center)
                 .font(.title2)
                 .foregroundStyle(.glmrPrimary)
@@ -196,7 +197,7 @@ struct AffirmationView: View {
     private var holdGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { _ in
-                guard viewModel.state != .completed, !viewModel.isHolding else { return }
+                guard !viewModel.state.isCompleted, !viewModel.isHolding else { return }
                 viewModel.startHolding()
             }
             .onEnded { _ in
@@ -206,11 +207,13 @@ struct AffirmationView: View {
 }
 
 #Preview {
+    let affirmationService = MockAffirmationService()
     AffirmationView(
         viewModel:
             AffirmationViewModel(
                 state: .hidden,
-                onReveal: {
+                affirmationService: affirmationService,
+                onReveal: { _ in
                     // No-op
                 }
             )

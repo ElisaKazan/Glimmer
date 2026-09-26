@@ -9,22 +9,24 @@ import SwiftUI
 
 @Observable
 final class AffirmationViewModel {
-    var state: State
+    var state: AffirmationState
     var progress: CGFloat = 0
     var isHolding: Bool = false
 
     private var holdTask: Task<Void, Never>?
-    private let onReveal: () -> Void
+    private let onReveal: (Affirmation) -> Void
 
-    let holdDuration: Double = 2.0
+    private let holdDuration: Double = 2.0
+    private let affirmationService: AffirmationServiceProtocol
 
-    var testAffirmation = Affirmation(
-        text: "This is a sample affirmation used for testing.",
-        category: .selfLove
-    )
 
-    init(state: State, onReveal: @escaping () -> Void) {
+    init(
+        state: AffirmationState,
+        affirmationService: AffirmationServiceProtocol,
+        onReveal: @escaping (Affirmation) -> Void,
+    ) {
         self.state = state
+        self.affirmationService = affirmationService
         self.onReveal = onReveal
     }
 
@@ -57,7 +59,7 @@ final class AffirmationViewModel {
         holdTask = nil
 
         // Only reset if they haven't successfully revealed
-        guard state == .holding else { return }
+        guard case .holding = state else { return }
 
         isHolding = false
         state = .hidden
@@ -68,21 +70,28 @@ final class AffirmationViewModel {
     }
 
     func revealAffirmation() {
+        // Fetch today's affirmation
+        guard let todaysAffirmation = affirmationService.getAffirmation() else {
+            // Error - failed to fetch today's affirmation
+            print("ERROR - Failed to fetch today's affirmation")
+            return
+        }
+
         print("⭐️ REVEAL")
-        state = .completed
+        state = .completed(todaysAffirmation)
         isHolding = false
         progress = 1
 
         // TODO: Change affirmation state to revealed
-        onReveal()
+        onReveal(todaysAffirmation)
     }
 
 }
 
-enum State {
+enum AffirmationState {
     case hidden
     case holding
-    case completed
+    case completed(Affirmation)
 
     var hintText: String {
         switch self {
@@ -112,6 +121,15 @@ enum State {
             2
         case .completed:
             0
+        }
+    }
+
+    var isCompleted: Bool {
+        switch self {
+        case .hidden, .holding:
+            false
+        case .completed:
+            true
         }
     }
 }
