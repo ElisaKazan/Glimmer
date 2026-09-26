@@ -14,7 +14,22 @@ import SwiftData
  */
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
-    @State var viewModel: HomeViewModel = HomeViewModel(revealState: .hidden)
+    @State private var viewModel: HomeViewModel
+    @State private var affirmationViewModel: AffirmationViewModel
+
+    init() {
+        let homeViewModel = HomeViewModel(revealState: .hidden)
+        let service = try! AffirmationService()
+
+        _viewModel = State(initialValue: homeViewModel)
+        _affirmationViewModel = State(
+            initialValue: AffirmationViewModel(
+                state: homeViewModel.revealState.affirmationState,
+                affirmationService: service,
+                onReveal: homeViewModel.revealAffirmation
+            )
+        )
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -22,12 +37,7 @@ struct HomeView: View {
 
             Spacer()
 
-            AffirmationView(
-                viewModel: AffirmationViewModel(
-                    state: .hidden,
-                    onReveal: viewModel.revealAffirmation
-                )
-            )
+            AffirmationView(viewModel: affirmationViewModel)
 
             Spacer()
 

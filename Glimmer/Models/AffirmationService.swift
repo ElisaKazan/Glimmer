@@ -8,7 +8,6 @@
 import Foundation
 
 protocol AffirmationServiceProtocol {
-    func fetchAffirmations() throws -> [Affirmation]
     func getAffirmation() -> Affirmation?
 }
 
@@ -18,14 +17,15 @@ struct AffirmationService: AffirmationServiceProtocol {
     let filename = "affirmation-database"
 
     init() throws {
-        affirmations = try fetchAffirmations()
+        affirmations = try loadAffirmations()
     }
 
     struct Response: Codable {
         let affirmations: [Affirmation]
     }
 
-    func fetchAffirmations() throws -> [Affirmation] {
+    // Loads affirmations from json to memory
+    private func loadAffirmations() throws -> [Affirmation] {
         guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
             throw AffirmationServiceError.fileNotFound
         }

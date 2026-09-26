@@ -29,6 +29,11 @@ struct Affirmation: Codable, Equatable {
         self.text = text
         self.category = category
     }
+
+    // Affirmation text with quotations
+    public var prettyText: String {
+        "“\(text)”"
+    }
 }
 
 enum Category: String, Codable {
