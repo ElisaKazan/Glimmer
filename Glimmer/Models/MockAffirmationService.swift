@@ -14,7 +14,7 @@ struct MockAffirmationService: AffirmationServiceProtocol {
         category: .selfLove
     )
 
-    func getAffirmation() -> Affirmation? {
+    func getAffirmation() throws -> Affirmation {
         return fakeAffirmation
     }
 

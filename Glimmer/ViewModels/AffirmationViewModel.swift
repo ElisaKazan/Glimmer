@@ -11,7 +11,6 @@ import SwiftUI
 final class AffirmationViewModel {
     var state: AffirmationState
     var progress: CGFloat = 0
-    var isHolding: Bool = false
 
     private var holdTask: Task<Void, Never>?
     private let onReveal: (Affirmation) -> Void
@@ -31,9 +30,13 @@ final class AffirmationViewModel {
     }
 
     func startHolding() {
+        // Can only start holding from hidden state
+        guard case .hidden = state else {
+            return
+        }
+
         print("💚 START HOLD")
         state = .holding
-        isHolding = true
         progress = 0
 
         withAnimation(.linear(duration: holdDuration)) {
@@ -52,16 +55,14 @@ final class AffirmationViewModel {
     }
 
     func stopHolding() {
+        // Can only stop holding from holding state
+        guard case .holding = state else {
+            return
+        }
         print("❤️ STOP HOLD")
-        guard isHolding else { return }
 
         holdTask?.cancel()
         holdTask = nil
-
-        // Only reset if they haven't successfully revealed
-        guard case .holding = state else { return }
-
-        isHolding = false
         state = .hidden
 
         withAnimation(.easeOut(duration: 0.4)) {
@@ -69,21 +70,19 @@ final class AffirmationViewModel {
         }
     }
 
-    func revealAffirmation() {
+    private func revealAffirmation() {
         // Fetch today's affirmation
-        guard let todaysAffirmation = affirmationService.getAffirmation() else {
-            // Error - failed to fetch today's affirmation
-            print("ERROR - Failed to fetch today's affirmation")
-            return
+        do {
+            let todaysAffirmation = try affirmationService.getAffirmation()
+
+            print("⭐️ REVEAL")
+            state = .completed(todaysAffirmation)
+            progress = 1
+
+            onReveal(todaysAffirmation)
+        } catch {
+            print("ERROR - Failed to fetch today's affirmation: \(error)")
         }
-
-        print("⭐️ REVEAL")
-        state = .completed(todaysAffirmation)
-        isHolding = false
-        progress = 1
-
-        // TODO: Change affirmation state to revealed
-        onReveal(todaysAffirmation)
     }
 
 }

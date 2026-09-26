@@ -17,15 +17,16 @@ struct HomeView: View {
     @State private var viewModel: HomeViewModel
     @State private var affirmationViewModel: AffirmationViewModel
 
+
     init() {
         let homeViewModel = HomeViewModel(revealState: .hidden)
-        let service = try! AffirmationService()
+        let affirmationService = AffirmationService()
 
         _viewModel = State(initialValue: homeViewModel)
         _affirmationViewModel = State(
             initialValue: AffirmationViewModel(
                 state: homeViewModel.revealState.affirmationState,
-                affirmationService: service,
+                affirmationService: affirmationService,
                 onReveal: homeViewModel.revealAffirmation
             )
         )

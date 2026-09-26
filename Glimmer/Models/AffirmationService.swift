@@ -8,23 +8,19 @@
 import Foundation
 
 protocol AffirmationServiceProtocol {
-    func getAffirmation() -> Affirmation?
+    func getAffirmation() throws -> Affirmation
 }
 
-struct AffirmationService: AffirmationServiceProtocol {
-    private var affirmations: [Affirmation] = []
+final class AffirmationService: AffirmationServiceProtocol {
+    private var affirmationCache: [Affirmation]?
 
     let filename = "affirmation-database"
-
-    init() throws {
-        affirmations = try loadAffirmations()
-    }
 
     struct Response: Codable {
         let affirmations: [Affirmation]
     }
 
-    // Loads affirmations from json to memory
+    // Loads affirmations from json
     private func loadAffirmations() throws -> [Affirmation] {
         guard let url = Bundle.main.url(forResource: filename, withExtension: "json") else {
             throw AffirmationServiceError.fileNotFound
@@ -36,18 +32,41 @@ struct AffirmationService: AffirmationServiceProtocol {
         return response.affirmations
     }
 
-    func getAffirmation() -> Affirmation? {
-        return affirmations.randomElement()
+    // Lazy loading affirmations to prevent multiple calls to loadAffirmations
+    private func getAffirmations() throws -> [Affirmation] {
+        if let affirmationCache {
+            return affirmationCache
+        }
+
+        let loadedAffirmations = try loadAffirmations()
+
+        affirmationCache = loadedAffirmations
+
+        return loadedAffirmations
+    }
+
+    // MARK: - Public Methods
+
+    func getAffirmation() throws -> Affirmation {
+        let affirmations = try getAffirmations()
+
+        guard let affirmation = affirmations.randomElement() else {
+            throw AffirmationServiceError.noAffirmations
+        }
+        return affirmation
     }
 }
 
 enum AffirmationServiceError: Error {
     case fileNotFound
+    case noAffirmations
 
     var errorMessage: String {
         switch self {
         case .fileNotFound:
-            "Could not find file."
+            "Could not find affirmation database file."
+        case .noAffirmations:
+            "Could get an affirmation, no affirmations found."
         }
     }
 }

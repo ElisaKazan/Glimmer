@@ -197,7 +197,6 @@ struct AffirmationView: View {
     private var holdGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { _ in
-                guard !viewModel.state.isCompleted, !viewModel.isHolding else { return }
                 viewModel.startHolding()
             }
             .onEnded { _ in
