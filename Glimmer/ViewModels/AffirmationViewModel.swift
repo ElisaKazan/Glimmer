@@ -9,29 +9,34 @@ import SwiftUI
 
 @Observable
 final class AffirmationViewModel {
-    var state: State
+    var state: AffirmationState
     var progress: CGFloat = 0
-    var isHolding: Bool = false
 
     private var holdTask: Task<Void, Never>?
-    private let onReveal: () -> Void
+    private let onReveal: (Affirmation) -> Void
 
-    let holdDuration: Double = 2.0
+    private let holdDuration: Double = 2.0
+    private let affirmationService: AffirmationServiceProtocol
 
-    var testAffirmation = Affirmation(
-        text: "This is a sample affirmation used for testing.",
-        category: .selfLove
-    )
 
-    init(state: State, onReveal: @escaping () -> Void) {
+    init(
+        state: AffirmationState,
+        affirmationService: AffirmationServiceProtocol,
+        onReveal: @escaping (Affirmation) -> Void,
+    ) {
         self.state = state
+        self.affirmationService = affirmationService
         self.onReveal = onReveal
     }
 
     func startHolding() {
+        // Can only start holding from hidden state
+        guard case .hidden = state else {
+            return
+        }
+
         print("💚 START HOLD")
         state = .holding
-        isHolding = true
         progress = 0
 
         withAnimation(.linear(duration: holdDuration)) {
@@ -50,16 +55,14 @@ final class AffirmationViewModel {
     }
 
     func stopHolding() {
+        // Can only stop holding from holding state
+        guard case .holding = state else {
+            return
+        }
         print("❤️ STOP HOLD")
-        guard isHolding else { return }
 
         holdTask?.cancel()
         holdTask = nil
-
-        // Only reset if they haven't successfully revealed
-        guard state == .holding else { return }
-
-        isHolding = false
         state = .hidden
 
         withAnimation(.easeOut(duration: 0.4)) {
@@ -67,22 +70,27 @@ final class AffirmationViewModel {
         }
     }
 
-    func revealAffirmation() {
-        print("⭐️ REVEAL")
-        state = .completed
-        isHolding = false
-        progress = 1
+    private func revealAffirmation() {
+        // Fetch today's affirmation
+        do {
+            let todaysAffirmation = try affirmationService.getAffirmation()
 
-        // TODO: Change affirmation state to revealed
-        onReveal()
+            print("⭐️ REVEAL")
+            state = .completed(todaysAffirmation)
+            progress = 1
+
+            onReveal(todaysAffirmation)
+        } catch {
+            print("ERROR - Failed to fetch today's affirmation: \(error)")
+        }
     }
 
 }
 
-enum State {
+enum AffirmationState {
     case hidden
     case holding
-    case completed
+    case completed(Affirmation)
 
     var hintText: String {
         switch self {
@@ -112,6 +120,15 @@ enum State {
             2
         case .completed:
             0
+        }
+    }
+
+    var isCompleted: Bool {
+        switch self {
+        case .hidden, .holding:
+            false
+        case .completed:
+            true
         }
     }
 }
