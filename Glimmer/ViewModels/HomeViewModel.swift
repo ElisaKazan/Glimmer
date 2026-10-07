@@ -12,8 +12,15 @@ final class HomeViewModel {
     var revealState: RevealState = .hidden
     var userName: String = "Elisa"
 
-    init(revealState: RevealState) {
-        self.revealState = revealState
+    private let affirmationService: AffirmationServiceProtocol
+    private let historyService: AffirmationHistoryServiceProtocol
+
+    init(
+        affirmationService: AffirmationServiceProtocol,
+        historyService: AffirmationHistoryServiceProtocol
+    ) {
+        self.affirmationService = affirmationService
+        self.historyService = historyService
     }
 
     // Todays Date (i.e. "TUESDAY, SEPTEMBER 1")
@@ -31,8 +38,15 @@ final class HomeViewModel {
         "Hello \(userName)!"
     }
 
+    // MARK: Public
+
     func revealAffirmation(_ affirmation: Affirmation) {
+        // TODO: Update with persistence (choose > save > update state)
         revealState = .revealed(affirmation)
+    }
+
+    func loadTodaysAffirmation() {
+        // TODO: check history > restore reveal state if necessary
     }
 }
 

@@ -10,18 +10,22 @@ import SwiftData
 
 @Model
 final class AffirmationRecord {
+    // The unique calendar day the affirmation was revealed (ex: "YYYY-MM-DD")
+    @Attribute(.unique)
+    var localDateIdentifier: String
+
+    // Exact date and time affirmation was revealed
     var date: Date
+    // Unique ID for the affirmation
     var affirmationID: UUID
-    // The calendar day the affirmation was revealed (ex: "YYYY-MM-DD")
-    var localDate: String
 
     public init(
         date: Date,
         affirmationID: UUID,
-        localDate: String,
+        localDateIdentifier: String,
     ) {
         self.date = date
         self.affirmationID = affirmationID
-        self.localDate = localDate
+        self.localDateIdentifier = localDateIdentifier
     }
 }

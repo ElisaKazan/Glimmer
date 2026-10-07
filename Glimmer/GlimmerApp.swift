@@ -25,7 +25,7 @@ struct GlimmerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            RootContainerView()
         }
         .modelContainer(sharedModelContainer)
     }

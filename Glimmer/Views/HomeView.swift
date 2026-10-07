@@ -13,21 +13,18 @@ import SwiftData
  * Starting view that contains a welcome header, the interactive affirmation view and an informational footer.
  */
 struct HomeView: View {
-    @Environment(\.modelContext) private var modelContext
-    @State private var viewModel: HomeViewModel
+    @Bindable var viewModel: HomeViewModel
     @State private var affirmationViewModel: AffirmationViewModel
 
 
-    init() {
-        let homeViewModel = HomeViewModel(revealState: .hidden)
-        let affirmationService = AffirmationService()
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
 
-        _viewModel = State(initialValue: homeViewModel)
         _affirmationViewModel = State(
             initialValue: AffirmationViewModel(
-                state: homeViewModel.revealState.affirmationState,
-                affirmationService: affirmationService,
-                onReveal: homeViewModel.revealAffirmation
+                state: viewModel.revealState.affirmationState,
+                affirmationService: AffirmationService(),
+                onReveal: viewModel.revealAffirmation
             )
         )
     }
@@ -87,6 +84,10 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
-        .modelContainer(for: AffirmationRecord.self, inMemory: true)
+    HomeView(
+        viewModel: HomeViewModel(
+            affirmationService: MockAffirmationService(),
+            historyService: MockAffirmationHistoryService()
+        )
+    )
 }

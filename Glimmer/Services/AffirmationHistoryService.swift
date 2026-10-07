@@ -9,9 +9,9 @@ import Foundation
 import SwiftData
 
 protocol AffirmationHistoryServiceProtocol {
-    func save(_ affirmation: Affirmation, for date: Date)
-    func getHistory() -> [AffirmationRecord]
-    func getRecord(for date: Date) -> AffirmationRecord?
+    func save(_ affirmation: Affirmation, for date: Date) throws
+    func getHistory() throws -> [AffirmationRecord]
+    func getRecord(for date: Date) throws -> AffirmationRecord?
 }
 
 final class AffirmationHistoryService: AffirmationHistoryServiceProtocol {
@@ -27,26 +27,11 @@ final class AffirmationHistoryService: AffirmationHistoryServiceProtocol {
         self.calendar = calendar
     }
 
-    private func localDateIdentifier(for date: Date) -> String {
-        let components = calendar.dateComponents(
-            [.year, .month, .day],
-            from: date
-        )
+    // MARK: AffirmationHistoryServiceProtocol
 
-        // Format: "YYYY-MM-DD"
-        return String(
-            format: "%04d-%02d-%02d",
-            components.year ?? 0,
-            components.month ?? 0,
-            components.day ?? 0
-        )
-    }
-
-    // MARK: Public
-
-    func save(_ affirmation: Affirmation, for date: Date = .now) {
+    func save(_ affirmation: Affirmation, for date: Date = .now) throws {
         // Check if affirmation has already been saved for this date
-        guard getRecord(for: date) == nil else {
+        guard try getRecord(for: date) == nil else {
             print("ERROR - Cannot save affirmation, record already exists. ")
             return
         }
@@ -54,34 +39,33 @@ final class AffirmationHistoryService: AffirmationHistoryServiceProtocol {
         let record = AffirmationRecord(
             date: date,
             affirmationID: affirmation.id,
-            localDate: localDateIdentifier(for: date)
+            localDateIdentifier: date.localDateIdentifier(calendar: calendar)
         )
 
         modelContext.insert(record)
+        try modelContext.save()
     }
     
-    func getHistory() -> [AffirmationRecord] {
+    func getHistory() throws -> [AffirmationRecord] {
         let descriptor = FetchDescriptor<AffirmationRecord>(
             sortBy: [
                 SortDescriptor(\.date, order: .reverse)
             ]
         )
 
-        return (try? modelContext.fetch(descriptor)) ?? []
+        return try modelContext.fetch(descriptor)
     }
     
-    func getRecord(for date: Date) -> AffirmationRecord? {
-        let localDate = localDateIdentifier(for: date)
+    func getRecord(for date: Date) throws -> AffirmationRecord? {
+        let localDateIdentifier = date.localDateIdentifier(calendar: calendar)
 
         let descriptor = FetchDescriptor<AffirmationRecord>(
             predicate: #Predicate { record in
-                record.localDate == localDate
+                record.localDateIdentifier == localDateIdentifier
             }
         )
 
-        guard let records = try? modelContext.fetch(descriptor) else {
-            return nil
-        }
+        let records = try modelContext.fetch(descriptor)
 
         // There should only ever be one affirmation per day
         if records.count > 1 {

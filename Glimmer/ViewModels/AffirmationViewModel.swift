@@ -9,6 +9,7 @@ import SwiftUI
 
 @Observable
 final class AffirmationViewModel {
+
     var state: AffirmationState
     var progress: CGFloat = 0
 
