@@ -40,9 +40,16 @@ final class HomeViewModel {
 
     // MARK: Public
 
-    func revealAffirmation(_ affirmation: Affirmation) {
-        // TODO: Update with persistence (choose > save > update state)
-        revealState = .revealed(affirmation)
+    func revealAffirmation() {
+        do {
+            let affirmation = try affirmationService.getAffirmation()
+
+            try historyService.save(affirmation, for: .now)
+
+            revealState = .revealed(affirmation)
+        } catch {
+            print("ERROR: Failed to reveal today's affirmation - \(error)")
+        }
     }
 
     func loadTodaysAffirmation() {
@@ -53,13 +60,4 @@ final class HomeViewModel {
 enum RevealState {
     case revealed(Affirmation)
     case hidden
-
-    var affirmationState: AffirmationState {
-        switch self {
-        case .revealed(let affirmation):
-            .completed(affirmation)
-        case .hidden:
-            .hidden
-        }
-    }
 }

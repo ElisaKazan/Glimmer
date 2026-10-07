@@ -14,19 +14,9 @@ import SwiftData
  */
 struct HomeView: View {
     @Bindable var viewModel: HomeViewModel
-    @State private var affirmationViewModel: AffirmationViewModel
-
 
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
-
-        _affirmationViewModel = State(
-            initialValue: AffirmationViewModel(
-                state: viewModel.revealState.affirmationState,
-                affirmationService: AffirmationService(),
-                onReveal: viewModel.revealAffirmation
-            )
-        )
     }
 
     var body: some View {
@@ -35,7 +25,10 @@ struct HomeView: View {
 
             Spacer()
 
-            AffirmationView(viewModel: affirmationViewModel)
+            AffirmationView(
+                revealState: viewModel.revealState,
+                onReveal: viewModel.revealAffirmation
+            )
 
             Spacer()
 
