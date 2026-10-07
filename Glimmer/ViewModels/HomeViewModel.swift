@@ -40,11 +40,11 @@ final class HomeViewModel {
 
     // MARK: Public
 
-    func revealAffirmation() {
+    func revealAffirmation(for date: Date = .now) {
         do {
             let affirmation = try affirmationService.getAffirmation()
 
-            try historyService.save(affirmation, for: .now)
+            try historyService.save(affirmation, for: date)
 
             revealState = .revealed(affirmation)
         } catch {
@@ -52,8 +52,23 @@ final class HomeViewModel {
         }
     }
 
-    func loadTodaysAffirmation() {
-        // TODO: check history > restore reveal state if necessary
+    func loadTodaysAffirmation(for date: Date = .now) {
+        do {
+            guard let record = try historyService.getRecord(for: date) else {
+                // Today's affirmation is still hidden
+                revealState = .hidden
+                return
+            }
+
+            // Today's affirmation has already been revealed
+            let affirmation = try affirmationService.getAffirmation(
+                id: record.affirmationID
+            )
+
+            revealState = .revealed(affirmation)
+        } catch {
+            print("ERROR: Failed to load today's affirmation - \(error)")
+        }
     }
 }
 

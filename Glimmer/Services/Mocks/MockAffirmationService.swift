@@ -8,6 +8,7 @@
 import Foundation
 
 final class MockAffirmationService: AffirmationServiceProtocol {
+
     let fakeAffirmation = Affirmation(
         id: UUID(uuidString: "01F47B4D-DAF9-44BF-8005-A170EB4EC2CC")!,
         text: "I embrace my uniqueness because that is my essence.",
@@ -18,4 +19,7 @@ final class MockAffirmationService: AffirmationServiceProtocol {
         return fakeAffirmation
     }
 
+    func getAffirmation(id: UUID) throws -> Affirmation {
+        return fakeAffirmation
+    }
 }

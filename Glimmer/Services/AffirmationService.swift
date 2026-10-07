@@ -9,6 +9,7 @@ import Foundation
 
 protocol AffirmationServiceProtocol {
     func getAffirmation() throws -> Affirmation
+    func getAffirmation(id: UUID) throws -> Affirmation
 }
 
 final class AffirmationService: AffirmationServiceProtocol {
@@ -47,6 +48,7 @@ final class AffirmationService: AffirmationServiceProtocol {
 
     // MARK: - Public Methods
 
+    // Gets a random affirmation
     func getAffirmation() throws -> Affirmation {
         let affirmations = try getAffirmations()
 
@@ -55,11 +57,25 @@ final class AffirmationService: AffirmationServiceProtocol {
         }
         return affirmation
     }
+
+    // Gets a specific affirmation using an ID
+    func getAffirmation(id: UUID) throws -> Affirmation {
+        let affirmations = try getAffirmations()
+
+        guard let affirmation = affirmations.first(
+            where: { $0.id == id }
+        ) else {
+            throw AffirmationServiceError.affirmationNotFound(id: id)
+        }
+
+        return affirmation
+    }
 }
 
 enum AffirmationServiceError: Error {
     case fileNotFound
     case noAffirmations
+    case affirmationNotFound(id: UUID)
 
     var errorMessage: String {
         switch self {
@@ -67,6 +83,8 @@ enum AffirmationServiceError: Error {
             "Could not find affirmation database file."
         case .noAffirmations:
             "Could get an affirmation, no affirmations found."
+        case .affirmationNotFound(let id):
+            "Could not find affirmation for id \(id)."
         }
     }
 }

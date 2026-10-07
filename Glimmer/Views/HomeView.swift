@@ -27,7 +27,9 @@ struct HomeView: View {
 
             AffirmationView(
                 revealState: viewModel.revealState,
-                onReveal: viewModel.revealAffirmation
+                onReveal: {
+                    viewModel.revealAffirmation()
+                }
             )
 
             Spacer()
@@ -37,6 +39,9 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, 8)
         .background(.glmrBackground)
+        .task {
+            viewModel.loadTodaysAffirmation()
+        }
     }
 
     @ViewBuilder private var headerSection: some View {

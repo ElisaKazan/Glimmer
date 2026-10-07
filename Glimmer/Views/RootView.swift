@@ -37,7 +37,7 @@ struct RootView: View {
     }
 
     var body: some View {
-        // TODO: This is where we will implement the tabbed views
+        // TODO: Let's add the tabbed experience here for Journal and Profile next!
         HomeView(viewModel: homeViewModel)
     }
 }
