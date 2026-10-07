@@ -88,5 +88,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-        .modelContainer(for: Entry.self, inMemory: true)
+        .modelContainer(for: AffirmationRecord.self, inMemory: true)
 }
