@@ -13,23 +13,10 @@ import SwiftData
  * Starting view that contains a welcome header, the interactive affirmation view and an informational footer.
  */
 struct HomeView: View {
-    @Environment(\.modelContext) private var modelContext
-    @State private var viewModel: HomeViewModel
-    @State private var affirmationViewModel: AffirmationViewModel
+    @Bindable var viewModel: HomeViewModel
 
-
-    init() {
-        let homeViewModel = HomeViewModel(revealState: .hidden)
-        let affirmationService = AffirmationService()
-
-        _viewModel = State(initialValue: homeViewModel)
-        _affirmationViewModel = State(
-            initialValue: AffirmationViewModel(
-                state: homeViewModel.revealState.affirmationState,
-                affirmationService: affirmationService,
-                onReveal: homeViewModel.revealAffirmation
-            )
-        )
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
     }
 
     var body: some View {
@@ -38,7 +25,12 @@ struct HomeView: View {
 
             Spacer()
 
-            AffirmationView(viewModel: affirmationViewModel)
+            AffirmationView(
+                revealState: viewModel.revealState,
+                onReveal: {
+                    viewModel.revealAffirmation()
+                }
+            )
 
             Spacer()
 
@@ -47,6 +39,9 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.top, 8)
         .background(.glmrBackground)
+        .task {
+            viewModel.loadTodaysAffirmation()
+        }
     }
 
     @ViewBuilder private var headerSection: some View {
@@ -87,6 +82,10 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
-        .modelContainer(for: Entry.self, inMemory: true)
+    HomeView(
+        viewModel: HomeViewModel(
+            affirmationService: MockAffirmationService(),
+            historyService: MockAffirmationHistoryService()
+        )
+    )
 }

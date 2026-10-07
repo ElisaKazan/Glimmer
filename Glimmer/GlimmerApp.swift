@@ -12,7 +12,7 @@ import SwiftData
 struct GlimmerApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Entry.self,
+            AffirmationRecord.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct GlimmerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            RootContainerView()
         }
         .modelContainer(sharedModelContainer)
     }

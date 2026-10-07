@@ -1,23 +1,12 @@
 //
-//  Item.swift
+//  Affirmation.swift
 //  Glimmer
 //
-//  Created by Elisa Kazan on 2026-09-01.
+//  Created by Elisa Kazan on 2026-09-30.
 //
 
 import Foundation
 import SwiftData
-
-@Model
-final class Entry {
-    var timestamp: Date
-    var affirmation: Affirmation
-
-    public init(timestamp: Date, affirmation: Affirmation) {
-        self.timestamp = timestamp
-        self.affirmation = affirmation
-    }
-}
 
 struct Affirmation: Codable, Equatable {
     var id: UUID

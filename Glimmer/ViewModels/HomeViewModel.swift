@@ -12,8 +12,15 @@ final class HomeViewModel {
     var revealState: RevealState = .hidden
     var userName: String = "Elisa"
 
-    init(revealState: RevealState) {
-        self.revealState = revealState
+    private let affirmationService: AffirmationServiceProtocol
+    private let historyService: AffirmationHistoryServiceProtocol
+
+    init(
+        affirmationService: AffirmationServiceProtocol,
+        historyService: AffirmationHistoryServiceProtocol
+    ) {
+        self.affirmationService = affirmationService
+        self.historyService = historyService
     }
 
     // Todays Date (i.e. "TUESDAY, SEPTEMBER 1")
@@ -31,21 +38,41 @@ final class HomeViewModel {
         "Hello \(userName)!"
     }
 
-    func revealAffirmation(_ affirmation: Affirmation) {
-        revealState = .revealed(affirmation)
+    // MARK: Public
+
+    func revealAffirmation(for date: Date = .now) {
+        do {
+            let affirmation = try affirmationService.getAffirmation()
+
+            try historyService.save(affirmation, for: date)
+
+            revealState = .revealed(affirmation)
+        } catch {
+            print("ERROR: Failed to reveal today's affirmation - \(error)")
+        }
+    }
+
+    func loadTodaysAffirmation(for date: Date = .now) {
+        do {
+            guard let record = try historyService.getRecord(for: date) else {
+                // Today's affirmation is still hidden
+                revealState = .hidden
+                return
+            }
+
+            // Today's affirmation has already been revealed
+            let affirmation = try affirmationService.getAffirmation(
+                id: record.affirmationID
+            )
+
+            revealState = .revealed(affirmation)
+        } catch {
+            print("ERROR: Failed to load today's affirmation - \(error)")
+        }
     }
 }
 
 enum RevealState {
     case revealed(Affirmation)
     case hidden
-
-    var affirmationState: AffirmationState {
-        switch self {
-        case .revealed(let affirmation):
-            .completed(affirmation)
-        case .hidden:
-            .hidden
-        }
-    }
 }

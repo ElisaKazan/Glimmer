@@ -12,7 +12,14 @@ import SwiftUI
  * View that contains the animating circle or affirmation and hint text below.
  */
 struct AffirmationView: View {
-    @State var viewModel: AffirmationViewModel
+    let revealState: RevealState
+    let onReveal: () -> Void
+    let holdDuration: Double = 2.0
+
+    // Interactive Hold Animation
+    @State private var isHolding = false
+    @State private var progress: CGFloat = 0
+    @State private var holdTask: Task<Void, Never>?
 
     // Decorative Animation
     @State var isPulsing: Bool = false
@@ -20,11 +27,11 @@ struct AffirmationView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            switch viewModel.state {
-            case .hidden, .holding:
-                hiddenAffirmationView
-            case .completed(let affirmation):
+            switch revealState {
+            case .revealed(let affirmation):
                 revealedAffirmationView(affirmation)
+            case .hidden:
+                hiddenAffirmationView
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -37,7 +44,7 @@ struct AffirmationView: View {
         VStack(spacing: 50) {
             animationSection
 
-            Text(viewModel.state.hintText)
+            Text(isHolding ? "KEEP HOLDING..." : "HOLD TO REVEAL")
                 .font(.caption)
                 .foregroundStyle(.glmrGrey)
         }
@@ -84,9 +91,9 @@ struct AffirmationView: View {
     @ViewBuilder private var progressRing: some View {
         // Inner Ring (loading)
         Circle()
-            .trim(from: 0, to: viewModel.progress)
+            .trim(from: 0, to: progress)
             .stroke(
-                viewModel.state.colour,
+                colour,
                 style: StrokeStyle(lineWidth: 3, lineCap: .round)
             )
             .rotationEffect(.degrees(-90))
@@ -97,14 +104,14 @@ struct AffirmationView: View {
     @ViewBuilder private var innerRing: some View {
         // Inner Ring (solid)
         Circle()
-            .stroke(viewModel.state.colour.opacity(0.15), lineWidth: 1)
+            .stroke(colour.opacity(0.15), lineWidth: 1)
             .frame(width: 180, height: 180)
     }
 
     @ViewBuilder private var outlineRing: some View {
         // Outline Ring (pulses)
         Circle()
-            .stroke(viewModel.state.colour.opacity(0.20 * viewModel.state.multiplier), lineWidth: 1)
+            .stroke(colour.opacity(0.20 * multiplier), lineWidth: 1)
             .frame(width: 160, height: 160)
             .scaleEffect(isPulsing ? 1.06 : 1.0)
             .opacity(isPulsing ? 1.0 : 0.5)
@@ -112,8 +119,6 @@ struct AffirmationView: View {
 
     @ViewBuilder private var filledCircle: some View {
         // Filled Circle (pulses)
-        let colour = viewModel.state.colour
-        let multiplier = viewModel.state.multiplier
         Circle()
             .fill(
                 RadialGradient(
@@ -134,15 +139,14 @@ struct AffirmationView: View {
     }
 
     @ViewBuilder private var mainCircle: some View {
-        let colour = viewModel.state.colour
         Circle()
-            .stroke(colour.opacity(0.50 * viewModel.state.multiplier), lineWidth: 2)
+            .stroke(colour.opacity(0.50 * multiplier), lineWidth: 2)
             .frame(width: 14, height: 14)
             .scaleEffect(isPulsing ? 1.04 : 1.0)
             .opacity(isPulsing ? 1.0 : 0.75)
 
         // Centre Point Outline
-        if case .holding = viewModel.state {
+        if isHolding {
             Circle()
                 .stroke(colour, lineWidth: 2)
                 .frame(width: 20, height: 20)
@@ -164,7 +168,7 @@ struct AffirmationView: View {
                 .padding(.horizontal, 14)
 
             // Caption
-            Text(viewModel.state.hintText)
+            Text("YOUR AFFIRMATION FOR TODAY")
                 .font(.caption)
                 .foregroundStyle(.glmrGrey)
         }
@@ -197,24 +201,86 @@ struct AffirmationView: View {
     private var holdGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { _ in
-                viewModel.startHolding()
+                startHolding()
             }
             .onEnded { _ in
-                viewModel.stopHolding()
+                stopHolding()
             }
+    }
+
+    private func startHolding() {
+        // Can only start holding from hidden state
+        guard case .hidden = revealState, !isHolding else { return }
+
+        print("💚 START HOLDING")
+        isHolding = true
+        progress = 0
+
+        withAnimation(.linear(duration: holdDuration)) {
+            progress = 1
+        }
+
+        holdTask = Task {
+            try? await Task.sleep(for: .seconds(holdDuration))
+
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                onReveal()
+            }
+        }
+    }
+
+    private func stopHolding() {
+        // Can only stop holding from holding state
+        guard isHolding else { return }
+
+        print("❤️ STOP HOLDING")
+
+        holdTask?.cancel()
+        holdTask = nil
+        isHolding = false
+
+        withAnimation(.easeOut(duration: 0.4)) {
+            progress = 0
+        }
+    }
+}
+
+// MARK: State Properties
+
+extension AffirmationView {
+
+    private var colour: Color {
+        switch revealState {
+        case .revealed:
+            return .glmrAccent
+        case .hidden:
+            return isHolding ? .glmrAccent : .glmrSecondary
+        }
+    }
+
+    private var multiplier: Double {
+        switch revealState {
+        case .revealed:
+            return 0
+        case .hidden:
+            return isHolding ? 2 : 1
+        }
+    }
+
+    private var isCompleted: Bool {
+        if case .revealed = revealState {
+            return true
+        }
+
+        return false
     }
 }
 
 #Preview {
     let affirmationService = MockAffirmationService()
-    AffirmationView(
-        viewModel:
-            AffirmationViewModel(
-                state: .hidden,
-                affirmationService: affirmationService,
-                onReveal: { _ in
-                    // No-op
-                }
-            )
-    )
+    AffirmationView(revealState: .hidden) {
+        // No-op
+    }
 }
