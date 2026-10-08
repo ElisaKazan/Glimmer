@@ -9,7 +9,7 @@ import Foundation
 
 extension Date {
     // Converts Date into "YYYY-MM-DD" string format given a calendar
-    public func localDateIdentifier(calendar: Calendar) -> String {
+    public func localDateIdentifier(calendar: Calendar = .autoupdatingCurrent) -> String {
         let components = calendar.dateComponents(
             [.year, .month, .day],
             from: self

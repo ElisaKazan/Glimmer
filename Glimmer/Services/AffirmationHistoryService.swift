@@ -21,7 +21,7 @@ final class AffirmationHistoryService: AffirmationHistoryServiceProtocol {
 
     init(
         modelContext: ModelContext,
-        calendar: Calendar = .current
+        calendar: Calendar = .autoupdatingCurrent
     ) {
         self.modelContext = modelContext
         self.calendar = calendar

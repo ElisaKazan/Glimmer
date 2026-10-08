@@ -14,6 +14,7 @@ import SwiftData
  */
 struct HomeView: View {
     @Bindable var viewModel: HomeViewModel
+    @Environment(\.scenePhase) private var scenePhase
 
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -41,6 +42,24 @@ struct HomeView: View {
         .background(.glmrBackground)
         .task {
             viewModel.loadTodaysAffirmation()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            // If user leaves the app in the background overnight, we want to reload affirmation
+            if newPhase == .active {
+                viewModel.reloadTodaysAffirmation()
+            }
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
+        ) { _ in
+            // If the date changes, we want to reload affirmation
+            viewModel.reloadTodaysAffirmation()
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(for: NSNotification.Name.NSSystemTimeZoneDidChange)
+        ) { _ in
+            // If the timezone changes, we want to reload affirmation
+            viewModel.reloadTodaysAffirmation()
         }
     }
 
